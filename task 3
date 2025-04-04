@@ -1,0 +1,132 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class BigInteger {
+private:
+    vector<int> digits;
+    bool isNegative;
+
+    void removeLeadingZeros() {
+        while (digits.size() > 1 && digits.back() == 0) {
+            digits.pop_back();
+        }
+    }
+
+public:
+    BigInteger() : isNegative(false) {}
+
+    BigInteger(const string &str) {
+        isNegative = (str[0] == '-');
+        for (int i = str.size() - 1; i >= (isNegative ? 1 : 0); --i) {
+            digits.push_back(str[i] - '0');
+        }
+        removeLeadingZeros();
+    }
+
+    void print() const {
+        if (isNegative) cout << "-";
+        for (int i = digits.size() - 1; i >= 0; i--) {
+            cout << digits[i];
+        }
+        cout << endl;
+    }
+
+    bool operator<(const BigInteger &other) const {
+        if (isNegative != other.isNegative) return isNegative;
+        if (digits.size() != other.digits.size()) {
+            return digits.size() < other.digits.size();
+        }
+        for (int i = digits.size() - 1; i >= 0; i--) {
+            if (digits[i] != other.digits[i]) return digits[i] < other.digits[i];
+        }
+        return false;
+    }
+
+    BigInteger operator+(const BigInteger &other) const {
+        if (isNegative != other.isNegative) return *this - (-other);
+
+        BigInteger result;
+        result.isNegative = isNegative;
+        int carry = 0;
+        size_t maxSize = digits.size() > other.digits.size() ? digits.size() : other.digits.size();
+        for (size_t i = 0; i < maxSize || carry; i++) {
+            int sum = carry;
+            if (i < digits.size()) sum += digits[i];
+            if (i < other.digits.size()) sum += other.digits[i];
+            result.digits.push_back(sum % 10);
+            carry = sum / 10;
+        }
+        result.removeLeadingZeros();
+        return result;
+    }
+
+    BigInteger operator-(const BigInteger &other) const {
+        if (isNegative != other.isNegative)
+            return *this + (-other);
+
+        if (isNegative && *this < other) {
+            BigInteger result = (other - *this);
+            result.isNegative = true;
+            return result;
+        }
+
+        if (!isNegative && *this < other) {
+            BigInteger result = (other - *this);
+            result.isNegative = true;
+            return result;
+        }
+
+        BigInteger result;
+        result.digits.clear();
+        result.isNegative = isNegative;
+        int borrow = 0;
+        for (size_t i = 0; i < digits.size(); i++) {
+            int sub = digits[i] - borrow;
+            if (i < other.digits.size()) sub -= other.digits[i];
+            if (sub < 0) {
+                sub += 10;
+                borrow = 1;
+            } else {
+                borrow = 0;
+            }
+            result.digits.push_back(sub);
+        }
+        result.removeLeadingZeros();
+        return result;
+    }
+
+    BigInteger operator-() const {
+        BigInteger result = *this;
+        result.isNegative = !isNegative;
+        return result;
+    }
+
+    friend ostream &operator<<(ostream &out, const BigInteger &b) {
+        if (b.isNegative) out << "-";
+        for (int i = b.digits.size() - 1; i >= 0; i--) {
+            out << b.digits[i];
+        }
+        return out;
+    }
+};
+
+int main() {
+    string a, b;
+    cout << "Enter first big integer: ";
+    cin >> a;
+    cout << "Enter second big integer: ";
+    cin >> b;
+
+    BigInteger num1(a), num2(b);
+
+    BigInteger sum = num1 + num2;
+    BigInteger diff = num1 - num2;
+
+    cout << "a + b = " << sum << endl;
+    cout << "a - b = " << diff << endl;
+
+    return 0;
+}
