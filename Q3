@@ -1,0 +1,81 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Person {
+protected:
+    int employeeID;
+
+public:
+    void getData(int id) {
+        employeeID = id;
+    }
+
+    void displayData() const {
+        cout << "Employee ID: " << employeeID << endl;
+    }
+};
+
+class Admin : public Person {
+private:
+    string name;
+    double monthlyIncome;
+
+public:
+    void getData(int id, const string& empName, double income) {
+        Person::getData(id);
+        name = empName;
+        monthlyIncome = income;
+    }
+
+    void displayData() const {
+        Person::displayData();
+        cout << "Name: " << name << endl;
+        cout << "Monthly Income: " << monthlyIncome << endl;
+    }
+
+    double bonus() const {
+        return monthlyIncome * 12 * 0.05; 
+    }
+};
+
+class Accounts : public Person {
+private:
+    string name;
+    double monthlyIncome;
+
+public:
+    void getData(int id, const string& empName, double income) {
+        Person::getData(id);
+        name = empName;
+        monthlyIncome = income;
+    }
+
+    void displayData() const {
+        Person::displayData();
+        cout << "Name: " << name << endl;
+        cout << "Monthly Income: " << monthlyIncome << endl;
+    }
+
+    double bonus() const {
+        return monthlyIncome * 12 * 0.05; 
+    }
+};
+
+int main() {
+    Admin admin;
+    Accounts accounts;
+
+    admin.getData(101, "Layqa", 5000);
+    accounts.getData(102, "Fatima", 4500);
+
+    cout << "Admin Employee Details:" << endl;
+    admin.displayData();
+    cout << "Annual Bonus: " << admin.bonus() << endl << endl;
+
+    cout << "Accounts Employee Details:" << endl;
+    accounts.displayData();
+    cout << "Annual Bonus: " << accounts.bonus() << endl;
+
+    return 0;
+}
